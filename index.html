@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Kethur Sai Krishna — Embedded Systems Engineer, IoT Developer & Product Innovator from Hyderabad."/>
+<title>KSK — Embedded Systems Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#03050a;--bg2:#060b14;--surface:rgba(255,255,255,0.03);--surface2:rgba(255,255,255,0.06);
+  --cyan:#00f5d4;--cyan2:#00c4aa;--cyan-glow:rgba(0,245,212,0.25);--cyan-dim:rgba(0,245,212,0.08);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.1);
+  --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.1);
+  --text:#e2e8f0;--muted:#64748b;--border:rgba(0,245,212,0.1);
+  --ff-d:'Syne',sans-serif;--ff-b:'Space Grotesk',sans-serif;--ff-m:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--ff-b);overflow-x:hidden;line-height:1.7}
+::selection{background:var(--cyan-dim);color:var(--cyan)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:2px}
+
+/* ── CURSOR ── */
+.cursor{position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .08s}
+.cursor-dot{width:8px;height:8px;background:var(--cyan);border-radius:50%;position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;transition:transform .1s,opacity .2s}
+.cursor-ring{width:36px;height:36px;border:1.5px solid rgba(0,245,212,0.5);border-radius:50%;position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:9998;transition:transform .18s,width .2s,height .2s,opacity .2s}
+
+/* ── PARTICLES CANVAS ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── LOADER / CINEMATIC BOOT ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+#loader{position:fixed;inset:0;z-index:9000;background:#000;overflow:hidden;transition:opacity 1s ease,transform 1.1s cubic-bezier(.4,0,.2,1)}
+#loader.out{opacity:0;transform:scale(1.06);pointer-events:none}
+
+/* full-screen boot canvas */
+#boot-canvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* center content */
+.l-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;z-index:2}
+
+/* glitch name */
+.l-glitch-wrap{position:relative;margin-bottom:28px}
+.l-big-name{font-family:var(--ff-d);font-size:clamp(3.5rem,11vw,9rem);font-weight:900;letter-spacing:-.04em;color:#fff;position:relative;animation:fadeIn .1s both}
+.l-big-name span{color:var(--cyan)}
+.l-big-name::before,.l-big-name::after{content:attr(data-text);position:absolute;inset:0;font-family:var(--ff-d);font-size:inherit;font-weight:900;letter-spacing:inherit}
+.l-big-name::before{color:rgba(0,245,212,.7);animation:glitchA 3.5s infinite;clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%)}
+.l-big-name::after{color:rgba(139,92,246,.7);animation:glitchB 3.5s infinite;clip-path:polygon(0 55%,100% 55%,100% 75%,0 75%)}
+@keyframes glitchA{
+  0%,85%,100%{transform:none;opacity:0}
+  86%{transform:translate(-3px,1px);opacity:.9}
+  88%{transform:translate(3px,-1px);opacity:.7}
+  90%{transform:translate(-1px,2px);opacity:.9}
+  92%{transform:none;opacity:0}
+}
+@keyframes glitchB{
+  0%,87%,100%{transform:none;opacity:0}
+  88%{transform:translate(3px,2px);opacity:.8}
+  90%{transform:translate(-3px,-1px);opacity:.6}
+  92%{transform:translate(1px,0);opacity:.8}
+  94%{transform:none;opacity:0}
+}
+
+/* tagline typewriter */
+.l-tagline{font-family:var(--ff-m);font-size:clamp(.7rem,1.4vw,.9rem);letter-spacing:.18em;color:var(--cyan);text-transform:uppercase;margin-bottom:40px;min-height:1.4em;opacity:0;animation:fadeIn .4s .3s ease forwards}
+
+/* progress system */
+.l-progress-wrap{width:min(420px,80vw);display:flex;flex-direction:column;gap:10px}
+.l-bar-outer{width:100%;height:2px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.l-bar-inner{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px;transition:width .12s ease}
+.l-status-row{display:flex;justify-content:space-between;align-items:center}
+.l-status-txt{font-family:var(--ff-m);font-size:.62rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.l-pct{font-family:var(--ff-m);font-size:.62rem;color:var(--cyan);letter-spacing:.06em}
+
+/* corner HUD decorations */
+.l-hud{position:absolute;font-family:var(--ff-m);font-size:.58rem;letter-spacing:.1em;color:rgba(0,245,212,.35);text-transform:uppercase;animation:fadeIn .8s 0.1s ease forwards;opacity:0}
+.l-hud.tl{top:28px;left:32px;text-align:left}
+.l-hud.tr{top:28px;right:32px;text-align:right}
+.l-hud.bl{bottom:28px;left:32px}
+.l-hud.br{bottom:28px;right:32px;text-align:right}
+.l-hud span{display:block;margin-bottom:4px}
+
+/* scan line sweep */
+.l-scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,245,212,.4),transparent);animation:scanSweep 2.4s linear infinite;pointer-events:none;z-index:3}
+@keyframes scanSweep{from{top:-2px}to{top:100%}}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;inset-x:0;z-index:500;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw;background:rgba(3,5,10,0);transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(3,5,10,.9);backdrop-filter:blur(20px);border-color:var(--border)}
+.nav-logo{font-family:var(--ff-m);font-size:.92rem;color:var(--cyan);text-decoration:none;letter-spacing:.08em}
+.nav-links{display:flex;gap:2.2rem;list-style:none}
+.nav-links a{font-size:.72rem;color:var(--muted);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;font-family:var(--ff-m);transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--cyan);transition:width .3s}
+.nav-links a:hover{color:var(--cyan)}
+.nav-links a:hover::after{width:100%}
+.nav-cta{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--ff-m);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:7px 18px;border-radius:6px;text-decoration:none;transition:background .2s,color .2s;white-space:nowrap}
+.nav-cta:hover{background:var(--cyan);color:var(--bg)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;z-index:600}
+.hamburger span{width:22px;height:1.5px;background:var(--cyan);transition:all .3s;display:block}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(4.5px,4.5px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(4.5px,-4.5px)}
+.mob-nav{position:fixed;inset:0;background:rgba(3,5,10,.97);backdrop-filter:blur(20px);z-index:490;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;transform:translateX(100%);transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.mob-nav.open{transform:none}
+.mob-nav a{font-family:var(--ff-m);font-size:1.3rem;color:var(--text);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
+.mob-nav a:hover{color:var(--cyan)}
+
+/* ── HERO ── */
+#hero{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:80px 5vw 80px;overflow:hidden;gap:0}
+/* left content */
+.hero-left{display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.hero-intro-line{font-family:var(--ff-m);font-size:.68rem;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:10px;opacity:0;animation:fadeUp .7s .2s ease forwards}
+.hero-intro-line::before{content:'';width:28px;height:1px;background:var(--cyan)}
+.pulse-dot{width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:pulseDot 2s infinite}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(0,245,212,.5)}50%{box-shadow:0 0 0 9px rgba(0,245,212,0)}}
+/* massive name */
+h1.hero-name{font-family:var(--ff-d);font-size:clamp(2.8rem,5.5vw,5.8rem);font-weight:900;line-height:.95;letter-spacing:-.04em;margin-bottom:0}
+.name-word{display:block;overflow:hidden}
+.name-inner{display:block;opacity:0;transform:translateY(110%);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.name-inner.show{opacity:1;transform:none}
+.name-inner.cyan{color:var(--cyan)}
+/* animated subtitle typewriter */
+.hero-type-wrap{margin:20px 0 32px;height:1.5rem;overflow:hidden}
+.hero-type{font-family:var(--ff-m);font-size:clamp(.75rem,1.2vw,.9rem);color:var(--muted);letter-spacing:.06em}
+.hero-type .caret{color:var(--cyan);animation:caretBlink .7s infinite}
+@keyframes caretBlink{0%,100%{opacity:1}50%{opacity:0}}
+/* actions */
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:52px;opacity:0;animation:fadeUp .7s .8s ease forwards}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--cyan);color:var(--bg);font-family:var(--ff-m);font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 26px;border-radius:8px;text-decoration:none;border:none;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.btn-primary::after{content:'';position:absolute;top:-50%;left:-60%;width:30%;height:200%;background:rgba(255,255,255,.2);transform:skewX(-20deg);transition:left .4s ease}
+.btn-primary:hover::after{left:130%}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px var(--cyan-glow)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);font-family:var(--ff-m);font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 26px;border-radius:8px;text-decoration:none;border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:all .25s}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px)}
+/* stat row */
+.hero-stats{display:flex;gap:36px;flex-wrap:wrap;opacity:0;animation:fadeUp .7s 1.1s ease forwards}
+.hstat{display:flex;flex-direction:column;gap:4px;position:relative}
+.hstat:not(:last-child)::after{content:'';position:absolute;right:-18px;top:8px;height:28px;width:1px;background:var(--border)}
+.hstat-val{font-family:var(--ff-d);font-size:1.9rem;font-weight:900;color:var(--cyan);line-height:1}
+.hstat-lbl{font-family:var(--ff-m);font-size:.58rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+
+/* ── RIGHT SIDE: HOLOGRAPHIC ESP32 CHIP VISUAL ── */
+.hero-right{position:relative;display:flex;align-items:center;justify-content:center;height:100%}
+#chip-canvas{width:100%;max-width:520px;aspect-ratio:1;display:block}
+
+/* floating data chips */
+.data-chip{position:absolute;font-family:var(--ff-m);font-size:.6rem;letter-spacing:.1em;color:var(--cyan);background:rgba(0,245,212,.05);border:1px solid rgba(0,245,212,.2);border-radius:6px;padding:5px 10px;backdrop-filter:blur(8px);white-space:nowrap;opacity:0;animation:chipFloat 4s ease-in-out infinite;pointer-events:none}
+.data-chip:nth-child(1){top:12%;right:2%;animation-delay:0s}
+.data-chip:nth-child(2){top:32%;left:0%;animation-delay:.7s}
+.data-chip:nth-child(3){bottom:28%;right:0%;animation-delay:1.4s}
+.data-chip:nth-child(4){bottom:12%;left:8%;animation-delay:2.1s;color:var(--amber);border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.05)}
+.data-chip:nth-child(5){top:55%;right:2%;animation-delay:2.8s;color:var(--purple);border-color:rgba(139,92,246,.25);background:rgba(139,92,246,.05)}
+@keyframes chipFloat{0%{opacity:0;transform:translateY(8px)}15%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(-4px)}100%{opacity:0;transform:translateY(-8px)}}
+
+/* scroll hint */
+.hero-scroll{position:absolute;bottom:32px;left:5vw;display:flex;align-items:center;gap:10px;font-family:var(--ff-m);font-size:.62rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;opacity:0;animation:fadeUp .7s 1.6s ease forwards;z-index:2}
+.scroll-line{width:40px;height:1px;background:var(--muted);position:relative;overflow:hidden}
+.scroll-line::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--cyan);animation:scanline 2s 2s linear infinite}
+@keyframes scanline{to{left:200%}}
+
+/* mobile hero stack */
+@media(max-width:860px){
+  #hero{grid-template-columns:1fr;padding-top:100px}
+  .hero-right{display:none}
+  h1.hero-name{font-size:clamp(2.6rem,10vw,4.5rem)}
+}
+
+/* ── SECTION BASE ── */
+.section{position:relative;z-index:1;padding:100px 5vw}
+.eyebrow{font-family:var(--ff-m);font-size:.65rem;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'//';opacity:.5}
+h2.section-title{font-family:var(--ff-d);font-size:clamp(2rem,4vw,3.2rem);font-weight:800;line-height:1.1;margin-bottom:12px;letter-spacing:-.02em}
+.section-sub{font-size:.95rem;color:var(--muted);max-width:520px;margin-bottom:60px;line-height:1.9}
+.glass{background:var(--surface);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(12px)}
+.glass:hover{border-color:rgba(0,245,212,.2)}
+
+/* ── ABOUT ── */
+#about{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.about-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:64px;align-items:start}
+.about-text p{color:var(--muted);margin-bottom:16px;line-height:1.95;font-size:.94rem}
+.about-text strong{color:var(--text)}
+.about-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.atag{font-family:var(--ff-m);font-size:.67rem;letter-spacing:.06em;padding:5px 14px;border:1px solid var(--border);border-radius:100px;color:var(--muted);background:var(--surface);transition:all .2s;cursor:default}
+.atag:hover{border-color:var(--cyan);color:var(--cyan)}
+.meta-stack{display:flex;flex-direction:column;gap:12px}
+.meta-item{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:border-color .2s}
+.meta-item:hover{border-color:rgba(0,245,212,.2)}
+.meta-icon{font-size:1.1rem;flex-shrink:0;width:32px;text-align:center}
+.meta-key{font-family:var(--ff-m);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.meta-val{font-size:.86rem;color:var(--text)}
+
+/* ── SKILLS UNIVERSE ── */
+#skills{background:var(--bg)}
+.skills-universe{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.skill-zone{background:var(--bg);padding:32px 24px;transition:background .3s;cursor:default;position:relative;overflow:hidden}
+.skill-zone::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.skill-zone:hover{background:var(--surface)}
+.skill-zone:hover::before{transform:scaleX(1)}
+.sz-icon{font-size:1.6rem;margin-bottom:14px}
+.sz-title{font-family:var(--ff-m);font-size:.7rem;letter-spacing:.12em;color:var(--cyan);text-transform:uppercase;margin-bottom:14px}
+.sz-items{display:flex;flex-direction:column;gap:8px}
+.sz-item{display:flex;align-items:center;justify-content:space-between;font-size:.84rem;color:var(--muted)}
+.sz-bar-wrap{width:64px;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;flex-shrink:0}
+.sz-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--purple));transform:scaleX(0);transform-origin:left;transition:transform 1s ease}
+.sz-bar.animated{transform:scaleX(1)}
+
+/* ── SERVICES ── */
+#services{background:var(--bg2)}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:48px}
+.svc-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px 28px;position:relative;overflow:hidden;transition:all .3s;cursor:default}
+.svc-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,245,212,.06),transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+.svc-card:hover{border-color:rgba(0,245,212,.25);transform:translateY(-6px);box-shadow:0 20px 48px rgba(0,245,212,.07)}
+.svc-card:hover::after{opacity:1}
+.svc-card.featured{border-color:rgba(0,245,212,.2)}
+.svc-badge-row{margin-bottom:18px}
+.svc-badge{font-family:var(--ff-m);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 12px;border-radius:100px;background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,245,212,.2)}
+.svc-badge.amber{background:var(--amber-dim);color:var(--amber);border-color:rgba(245,158,11,.25)}
+.svc-icon{font-size:2rem;margin-bottom:16px}
+.svc-title{font-family:var(--ff-d);font-size:1.15rem;font-weight:700;margin-bottom:10px}
+.svc-desc{font-size:.86rem;color:var(--muted);line-height:1.9;margin-bottom:18px}
+.svc-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.svc-list li{font-size:.82rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px}
+.svc-list li::before{content:'→';color:var(--cyan);font-size:.75rem;margin-top:2px;flex-shrink:0}
+.svc-price{font-family:var(--ff-m);font-size:.7rem;color:var(--cyan);border-top:1px solid var(--border);padding-top:14px;letter-spacing:.04em}
+.svc-banner{background:linear-gradient(135deg,rgba(0,245,212,.06),rgba(139,92,246,.06));border:1px solid var(--border);border-radius:18px;padding:40px 44px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
+.svc-banner h3{font-family:var(--ff-d);font-size:1.4rem;font-weight:800;margin-bottom:8px}
+.svc-banner p{font-size:.88rem;color:var(--muted);max-width:420px}
+.svc-banner-btns{display:flex;gap:14px;flex-wrap:wrap}
+
+/* ── PROJECTS ── */
+#projects{background:var(--bg)}
+.proj-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;display:flex;flex-direction:column;transition:all .3s;position:relative;overflow:hidden}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity .4s}
+.proj-card:hover{border-color:rgba(0,245,212,.2);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,245,212,.06)}
+.proj-card:hover::before{opacity:1}
+.proj-card.span-8{grid-column:span 8}
+.proj-card.span-4{grid-column:span 4}
+.proj-card.span-6{grid-column:span 6}
+.proj-card.span-3{grid-column:span 3}
+.proj-label{font-family:var(--ff-m);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 12px;border-radius:100px;display:inline-block;margin-bottom:16px;background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,245,212,.2)}
+.proj-label.amber{background:var(--amber-dim);color:var(--amber);border-color:rgba(245,158,11,.25)}
+.proj-label.purple{background:var(--purple-dim);color:var(--purple);border-color:rgba(139,92,246,.25)}
+.proj-title{font-family:var(--ff-d);font-size:1.15rem;font-weight:800;margin-bottom:4px}
+.proj-subtitle{font-family:var(--ff-m);font-size:.68rem;color:var(--cyan);letter-spacing:.06em;margin-bottom:12px}
+.proj-desc{font-size:.85rem;color:var(--muted);line-height:1.85;margin-bottom:14px;flex:1}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.chip{font-size:.69rem;padding:3px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;color:var(--muted)}
+.stack-chip{font-family:var(--ff-m);font-size:.64rem;padding:3px 10px;background:var(--cyan-dim);border:1px solid rgba(0,245,212,.15);border-radius:4px;color:var(--cyan)}
+/* visual accent for flagship cards */
+.proj-card.span-8 .proj-visual{height:5px;background:linear-gradient(90deg,var(--cyan),var(--purple),transparent);border-radius:2px;margin-bottom:20px;opacity:.6}
+.proj-card.span-6 .proj-visual{height:3px;background:linear-gradient(90deg,var(--cyan),transparent);border-radius:2px;margin-bottom:16px;opacity:.5}
+
+/* ── JOURNEY TIMELINE ── */
+#journey{background:var(--bg2)}
+.tl-wrap{position:relative;max-width:760px}
+.tl-spine{position:absolute;left:18px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--cyan),var(--purple),transparent);opacity:.25}
+.tl-item{position:relative;padding-left:56px;margin-bottom:48px;opacity:0;transform:translateX(-20px);transition:opacity .7s,transform .7s}
+.tl-item.show{opacity:1;transform:none}
+.tl-node{position:absolute;left:9px;top:6px;width:18px;height:18px;border-radius:50%;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center}
+.tl-node::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan-glow)}
+.tl-node.purple::before{background:var(--purple);box-shadow:0 0 14px rgba(139,92,246,.4)}
+.tl-node.amber::before{background:var(--amber);box-shadow:0 0 14px rgba(245,158,11,.4)}
+.tl-year{font-family:var(--ff-m);font-size:.66rem;color:var(--cyan);letter-spacing:.12em;margin-bottom:6px}
+.tl-year.purple{color:var(--purple)}
+.tl-year.amber{color:var(--amber)}
+.tl-title{font-family:var(--ff-d);font-size:1.05rem;font-weight:800;margin-bottom:6px}
+.tl-desc{font-size:.86rem;color:var(--muted);line-height:1.9}
+
+/* ── LIVE ACTIVITY DASHBOARD ── */
+#dashboard{background:var(--bg)}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.dash-card::before{content:'';position:absolute;bottom:0;left:0;width:100%;height:2px;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.dash-card:hover::before{transform:scaleX(1)}
+.dc-label{font-family:var(--ff-m);font-size:.62rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.dc-value{font-family:var(--ff-d);font-size:2.2rem;font-weight:900;color:var(--cyan);line-height:1;margin-bottom:4px}
+.dc-value.amber{color:var(--amber)}
+.dc-value.purple{color:var(--purple)}
+.dc-sub{font-size:.78rem;color:var(--muted)}
+.dc-bar-wrap{margin-top:14px;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.dc-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform 1.2s ease}
+.dc-bar.animated{transform:scaleX(1)}
+.activity-log{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px}
+.al-title{font-family:var(--ff-m);font-size:.7rem;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase;margin-bottom:20px}
+.al-feed{display:flex;flex-direction:column;gap:12px}
+.al-entry{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.al-entry:last-child{border-bottom:none}
+.al-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.al-dot.cyan{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.al-dot.amber{background:var(--amber);box-shadow:0 0 8px rgba(245,158,11,.4)}
+.al-dot.purple{background:var(--purple);box-shadow:0 0 8px rgba(139,92,246,.4)}
+.al-text{font-size:.83rem;color:var(--muted);line-height:1.7}
+.al-text strong{color:var(--text)}
+.al-time{font-family:var(--ff-m);font-size:.62rem;color:var(--muted);flex-shrink:0;margin-top:4px}
+
+/* ── VISION ── */
+#vision{background:var(--bg2)}
+.vision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-bottom:60px}
+.vision-card{padding:28px;background:var(--surface);border:1px solid var(--border);border-radius:16px;transition:all .3s;position:relative;overflow:hidden;cursor:default}
+.vision-card::after{content:'';position:absolute;top:-40px;right:-40px;width:100px;height:100px;background:radial-gradient(circle,rgba(0,245,212,.06),transparent);opacity:0;transition:opacity .4s}
+.vision-card:hover{border-color:rgba(0,245,212,.25);transform:translateY(-4px)}
+.vision-card:hover::after{opacity:1}
+.vc-icon{font-size:1.6rem;margin-bottom:14px}
+.vc-title{font-family:var(--ff-d);font-size:1rem;font-weight:800;margin-bottom:8px}
+.vc-desc{font-size:.84rem;color:var(--muted);line-height:1.9}
+.vision-quote{text-align:center;max-width:640px;margin:0 auto;padding:48px 0 0}
+.vq-text{font-family:var(--ff-d);font-size:clamp(1.1rem,2.2vw,1.6rem);font-weight:700;color:var(--text);line-height:1.5;margin-bottom:16px}
+.vq-attr{font-family:var(--ff-m);font-size:.7rem;color:var(--muted);letter-spacing:.1em}
+
+/* ── CONTACT ── */
+#contact{background:var(--bg)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:64px;align-items:start}
+.ct-avail{display:inline-flex;align-items:center;gap:8px;font-family:var(--ff-m);font-size:.66rem;letter-spacing:.12em;color:#4ade80;text-transform:uppercase;padding:5px 14px;border:1px solid rgba(74,222,128,.2);border-radius:100px;background:rgba(74,222,128,.06);margin-bottom:24px}
+.ct-avail-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite}
+.ct-name{font-family:var(--ff-d);font-size:1.2rem;font-weight:800;margin-bottom:24px}
+.ct-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.ct-icon{width:38px;height:38px;background:var(--surface);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.ct-key{font-family:var(--ff-m);font-size:.62rem;color:var(--muted);letter-spacing:.08em;margin-bottom:2px}
+.ct-val{font-size:.88rem;color:var(--text)}
+.ct-val a{color:var(--cyan);text-decoration:none}
+.ct-val a:hover{text-decoration:underline}
+.ct-socials{display:flex;gap:8px;margin-top:24px;flex-wrap:wrap}
+.soc{font-family:var(--ff-m);font-size:.68rem;letter-spacing:.06em;padding:8px 16px;border:1px solid var(--border);border-radius:8px;color:var(--muted);text-decoration:none;background:var(--surface);transition:all .2s}
+.soc:hover{border-color:var(--cyan);color:var(--cyan)}
+/* form */
+.ct-form{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px}
+.ct-form-title{font-family:var(--ff-d);font-size:1.15rem;font-weight:800;margin-bottom:6px}
+.ct-form-sub{font-size:.86rem;color:var(--muted);margin-bottom:28px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.fg label{font-family:var(--ff-m);font-size:.65rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--ff-b);font-size:.86rem;outline:none;width:100%;transition:border-color .2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--cyan);background:rgba(0,245,212,.03)}
+.fg textarea{resize:vertical;min-height:110px}
+.fg select{cursor:pointer}
+.fg select option{background:#060b14;color:var(--text)}
+.form-btn{background:var(--cyan);color:var(--bg);font-family:var(--ff-m);font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 24px;border-radius:10px;border:none;cursor:pointer;transition:all .25s;width:100%;display:flex;align-items:center;justify-content:center;gap:10px}
+.form-btn:hover{background:#00ddc0;transform:translateY(-1px);box-shadow:0 10px 28px var(--cyan-glow)}
+.form-note{font-family:var(--ff-m);font-size:.64rem;color:var(--muted);text-align:center;margin-top:10px;letter-spacing:.06em}
+
+/* ── EDUCATION ── */
+#education{background:var(--bg2)}
+.edu-list{display:flex;flex-direction:column;gap:16px;max-width:680px}
+.edu-item{display:flex;gap:22px;padding:22px 24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;transition:border-color .2s}
+.edu-item:hover{border-color:rgba(0,245,212,.2)}
+.edu-year{font-family:var(--ff-m);font-size:.68rem;color:var(--cyan);letter-spacing:.1em;white-space:nowrap;padding-top:3px;min-width:90px}
+.edu-body h3{font-family:var(--ff-d);font-size:.96rem;font-weight:700;margin-bottom:4px}
+.edu-body p{font-size:.83rem;color:var(--muted)}
+.edu-body .cgpa{font-family:var(--ff-m);font-size:.68rem;color:var(--cyan);margin-top:5px}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;background:var(--bg2);border-top:1px solid var(--border);padding:28px 5vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.foot-logo{font-family:var(--ff-m);font-size:.88rem;color:var(--cyan)}
+.foot-copy{font-family:var(--ff-m);font-size:.66rem;color:var(--muted);letter-spacing:.05em}
+
+/* ── SCROLL TOP ── */
+#stb{position:fixed;bottom:28px;right:28px;z-index:200;width:44px;height:44px;background:var(--surface);border:1px solid var(--border);border-radius:50%;color:var(--cyan);font-size:1rem;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .25s}
+#stb:hover{background:var(--cyan-dim);border-color:var(--cyan)}
+#stb.vis{display:flex}
+
+/* ── DIVIDER ── */
+.hdiv{border:none;border-top:1px solid var(--border);position:relative;z-index:1}
+
+/* ── REVEAL ANIMATION ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s}
+.reveal.show{opacity:1;transform:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .nav-links,.nav-cta{display:none}
+  .hamburger{display:flex}
+  .hero-orb-wrap{display:none}
+  .about-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .proj-card.span-8,.proj-card.span-4,.proj-card.span-6,.proj-card.span-3{grid-column:span 12}
+}
+@media(max-width:600px){
+  .hero-stats{gap:24px}.form-row{grid-template-columns:1fr}
+  .svc-banner{flex-direction:column;align-items:flex-start;padding:28px 24px}
+  .section{padding:72px 5vw}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- BACKGROUND CANVAS -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- CINEMATIC BOOT LOADER -->
+<div id="loader">
+  <canvas id="boot-canvas"></canvas>
+  <div class="l-scanline"></div>
+  <div class="l-hud tl"><span>SYS // KSK-OS v2.6</span><span>NODE: ESP32-S3</span><span>STATUS: ONLINE</span></div>
+  <div class="l-hud tr"><span>HYD · INDIA</span><span>LAT 17.38 LNG 78.48</span><span id="l-clock">--:--:--</span></div>
+  <div class="l-hud bl"><span>STACK: IoT + EDGE AI</span><span>PROTOCOL: MQTT / BLE</span></div>
+  <div class="l-hud br"><span>BUILD: 2026.06</span><span>CGPA: 7.68</span></div>
+  <div class="l-center">
+    <div class="l-glitch-wrap">
+      <div class="l-big-name" data-text="KSK">K<span>S</span>K</div>
+    </div>
+    <div class="l-tagline" id="l-tagline">_</div>
+    <div class="l-progress-wrap">
+      <div class="l-bar-outer"><div class="l-bar-inner" id="l-bar"></div></div>
+      <div class="l-status-row">
+        <div class="l-status-txt" id="l-status">initializing...</div>
+        <div class="l-pct" id="l-pct">0%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCROLL TOP -->
+<button id="stb" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#hero" class="nav-logo">&lt;KSK/&gt;</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#journey">Journey</a></li>
+    <li><a href="#vision">Vision</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#request" class="nav-cta">⚡ Request a Project</a>
+  <div class="hamburger" id="hbg"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mob-nav" id="mobNav">
+  <a href="#about" onclick="closeMob()">About</a>
+  <a href="#skills" onclick="closeMob()">Skills</a>
+  <a href="#services" onclick="closeMob()">Services</a>
+  <a href="#projects" onclick="closeMob()">Projects</a>
+  <a href="#journey" onclick="closeMob()">Journey</a>
+  <a href="#vision" onclick="closeMob()">Vision</a>
+  <a href="#contact" onclick="closeMob()">Contact</a>
+</div>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section id="hero">
+  <!-- LEFT -->
+  <div class="hero-left">
+    <div class="hero-intro-line"><span class="pulse-dot"></span> Available for Collaboration · Hyderabad, India</div>
+    <h1 class="hero-name">
+      <span class="name-word"><span class="name-inner" id="nl1">Kethur</span></span>
+      <span class="name-word"><span class="name-inner cyan" id="nl2">Sai Krishna</span></span>
+    </h1>
+    <div class="hero-type-wrap">
+      <span class="hero-type" id="heroType"><span class="caret">|</span></span>
+    </div>
+    <div class="hero-actions">
+      <a href="#projects" class="btn-primary">▶ View Projects</a>
+      <a href="#request" class="btn-primary" style="background:var(--amber);color:#000;">⚡ Request a Project</a>
+      <a href="#contact" class="btn-ghost">Contact Me</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val">10+</div><div class="hstat-lbl">Projects Built</div></div>
+      <div class="hstat"><div class="hstat-val">ESP32</div><div class="hstat-lbl">Core Platform</div></div>
+      <div class="hstat"><div class="hstat-val">7.68</div><div class="hstat-lbl">CGPA · JNTUH</div></div>
+      <div class="hstat"><div class="hstat-val">IoT</div><div class="hstat-lbl">Specialization</div></div>
+    </div>
+  </div>
+  <!-- RIGHT: holographic chip canvas -->
+  <div class="hero-right">
+    <canvas id="chip-canvas"></canvas>
+    <div class="data-chip">ESP32-S3 · 240MHz</div>
+    <div class="data-chip">MQTT · BLE · Wi-Fi</div>
+    <div class="data-chip">MAX30102 · BME280</div>
+    <div class="data-chip">⚡ 7.68 CGPA</div>
+    <div class="data-chip">Edge AI · TinyML</div>
+  </div>
+  <div class="hero-scroll"><div class="scroll-line"></div> Scroll to explore</div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ ABOUT ═══════════════ -->
+<section id="about" class="section">
+  <div class="eyebrow">Who I Am</div>
+  <h2 class="section-title reveal">Engineer by Logic,<br>Innovator by Nature</h2>
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <p>I'm a <strong>B.Tech Electronics and Communication Engineering graduate (CGPA: 7.68)</strong> from AAR Mahaveer Engineering College, JNTU Hyderabad — driven by a single conviction: the most impactful technologies of the next decade will live at the intersection of hardware and human need.</p>
+      <p>Proficient in <strong>ESP32, Arduino, and sensor-based system design</strong> — with hands-on experience building a smart infant monitoring system (Vital Nova Pod) and an AI-based wearable health device (VitaWatch). My work lives in the physical world: sensors that feel, microcontrollers that think, and devices that genuinely improve human lives.</p>
+      <p>A fast learner with a builder's mindset — committed to engineering solutions that make a meaningful difference, from health-tech wearables to safety systems for society. Inspired by <strong>Nikola Tesla</strong>.</p>
+      <div class="about-tags">
+        <span class="atag">Hardware-First</span>
+        <span class="atag">Human-Centered</span>
+        <span class="atag">Research-Driven</span>
+        <span class="atag">Product Mindset</span>
+        <span class="atag">Edge AI / TinyML</span>
+        <span class="atag">IoT Systems</span>
+      </div>
+    </div>
+    <div class="meta-stack">
+      <div class="meta-item"><div class="meta-icon">📅</div><div><div class="meta-key">Date of Birth</div><div class="meta-val">30 August 2004</div></div></div>
+      <div class="meta-item"><div class="meta-icon">📍</div><div><div class="meta-key">Location</div><div class="meta-val">Hyderabad, Telangana</div></div></div>
+      <div class="meta-item"><div class="meta-icon">🎓</div><div><div class="meta-key">Degree</div><div class="meta-val">B.Tech ECE · JNTUH 2026</div></div></div>
+      <div class="meta-item"><div class="meta-icon">💬</div><div><div class="meta-key">Languages</div><div class="meta-val">English · Telugu · Hindi</div></div></div>
+      <div class="meta-item"><div class="meta-icon">🔭</div><div><div class="meta-key">Interests</div><div class="meta-val">DIY Electronics · Wearable Tech · Edge AI</div></div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ SKILLS UNIVERSE ═══════════════ -->
+<section id="skills" class="section">
+  <div class="eyebrow">Capabilities</div>
+  <h2 class="section-title reveal">Skills Universe</h2>
+  <p class="section-sub reveal">Every tool, protocol, and platform I've mastered — from bare-metal C to IoT cloud dashboards.</p>
+  <div class="skills-universe reveal" id="skillsUniverse">
+    <div class="skill-zone">
+      <div class="sz-icon">⚙️</div>
+      <div class="sz-title">Embedded Systems</div>
+      <div class="sz-items">
+        <div class="sz-item"><span>ESP32 / ESP32-S3</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.95"></div></div></div>
+        <div class="sz-item"><span>Arduino</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.9"></div></div></div>
+        <div class="sz-item"><span>Embedded C</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.85"></div></div></div>
+        <div class="sz-item"><span>ESP8266</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.8"></div></div></div>
+        <div class="sz-item"><span>nRF52832</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.7"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-zone">
+      <div class="sz-icon">📡</div>
+      <div class="sz-title">IoT & Protocols</div>
+      <div class="sz-items">
+        <div class="sz-item"><span>MQTT</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.9"></div></div></div>
+        <div class="sz-item"><span>I2C / SPI / UART</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.92"></div></div></div>
+        <div class="sz-item"><span>BLE / Wi-Fi</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.85"></div></div></div>
+        <div class="sz-item"><span>GPS / GSM</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.8"></div></div></div>
+        <div class="sz-item"><span>IoT Dashboards</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.78"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-zone">
+      <div class="sz-icon">🔧</div>
+      <div class="sz-title">Hardware</div>
+      <div class="sz-items">
+        <div class="sz-item"><span>Sensor Integration</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.95"></div></div></div>
+        <div class="sz-item"><span>PCB Design</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.75"></div></div></div>
+        <div class="sz-item"><span>OLED / LCD</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.9"></div></div></div>
+        <div class="sz-item"><span>Prototyping</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.92"></div></div></div>
+        <div class="sz-item"><span>Troubleshooting</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.88"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-zone">
+      <div class="sz-icon">🛠️</div>
+      <div class="sz-title">Tools & Software</div>
+      <div class="sz-items">
+        <div class="sz-item"><span>Arduino IDE / VS Code</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.95"></div></div></div>
+        <div class="sz-item"><span>GitHub</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.82"></div></div></div>
+        <div class="sz-item"><span>HTML / CSS / JS</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.78"></div></div></div>
+        <div class="sz-item"><span>Edge AI / TinyML</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.65"></div></div></div>
+        <div class="sz-item"><span>Rapid Prototyping</span><div class="sz-bar-wrap"><div class="sz-bar" style="--w:.9"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ SERVICES ═══════════════ -->
+<section id="services" class="section">
+  <div class="eyebrow">What I Build</div>
+  <h2 class="section-title reveal">Services</h2>
+  <p class="section-sub reveal">From student final-year projects to production IoT systems — real, working embedded solutions tailored to your need and budget.</p>
+  <div class="svc-grid reveal">
+    <div class="svc-card featured" id="svc1">
+      <div class="svc-badge-row"><span class="svc-badge">⭐ Most Requested</span></div>
+      <div class="svc-icon">🎓</div>
+      <div class="svc-title">Final-Year Projects</div>
+      <p class="svc-desc">Complete JNTUH-aligned B.Tech final year projects with full documentation, report writing, and presentation support. Hardware + software delivered end-to-end.</p>
+      <ul class="svc-list">
+        <li>Full working prototype on ESP32 / Arduino</li>
+        <li>Project report &amp; PPT included</li>
+        <li>Demo video &amp; viva preparation support</li>
+        <li>IoT, health-tech, or safety system topics</li>
+        <li>JNTUH submission-ready format</li>
+      </ul>
+      <div class="svc-price">💡 Discuss your topic → get a custom quote</div>
+    </div>
+    <div class="svc-card" id="svc2">
+      <div class="svc-badge-row"><span class="svc-badge amber">Quick Delivery</span></div>
+      <div class="svc-icon">⚡</div>
+      <div class="svc-title">Mini Projects</div>
+      <p class="svc-desc">Fast-turnaround embedded mini projects for lab submissions, coursework, internship demos, or personal learning. Clean code, tested circuits.</p>
+      <ul class="svc-list">
+        <li>Arduino / ESP32-based builds</li>
+        <li>Sensor interfacing &amp; display modules</li>
+        <li>GSM, GPS, relay &amp; actuator projects</li>
+        <li>Code + circuit diagram provided</li>
+        <li>Quick 3–7 day delivery possible</li>
+      </ul>
+      <div class="svc-price">💡 Starting from affordable rates</div>
+    </div>
+    <div class="svc-card" id="svc3">
+      <div class="svc-badge-row"><span class="svc-badge">Industry-Grade</span></div>
+      <div class="svc-icon">🌐</div>
+      <div class="svc-title">IoT Solutions</div>
+      <p class="svc-desc">End-to-end IoT system development — from sensor nodes to MQTT cloud dashboards. Real-time data, smart alerts, and remote monitoring built for real environments.</p>
+      <ul class="svc-list">
+        <li>ESP32 + MQTT cloud integration</li>
+        <li>Health, agriculture, or home automation</li>
+        <li>Mobile alerts &amp; remote monitoring</li>
+        <li>Multi-sensor fusion &amp; data logging</li>
+        <li>Edge AI / TinyML integration available</li>
+      </ul>
+      <div class="svc-price">💡 Scope-based pricing — let's talk</div>
+    </div>
+    <div class="svc-card" id="svc4">
+      <div class="svc-badge-row"><span class="svc-badge amber">Custom Build</span></div>
+      <div class="svc-icon">🔩</div>
+      <div class="svc-title">Custom Hardware Projects</div>
+      <p class="svc-desc">Have a unique idea? I'll design, prototype, and build a custom embedded hardware solution from scratch — turning your concept into a working device.</p>
+      <ul class="svc-list">
+        <li>Concept to prototype in weeks</li>
+        <li>Wearables, health monitors, safety systems</li>
+        <li>PCB layout guidance &amp; component sourcing</li>
+        <li>Enclosure &amp; form factor advice</li>
+        <li>Confidential NDA-friendly collaboration</li>
+      </ul>
+      <div class="svc-price">💡 Share your idea — I'll tell you what's possible</div>
+    </div>
+  </div>
+  <div class="svc-banner reveal">
+    <div>
+      <h3>Ready to Build Something Real?</h3>
+      <p>Whether it's a final-year project deadline or a product idea you've had for months — drop your idea below and I'll get back to you within 24 hours.</p>
+    </div>
+    <div class="svc-banner-btns">
+      <a href="#request" class="btn-primary" style="background:var(--amber);color:#000;">⚡ Request a Project</a>
+      <a href="#contact" class="btn-ghost">Send a Message</a>
+    </div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ PROJECTS ═══════════════ -->
+<section id="projects" class="section">
+  <div class="eyebrow">Build Log</div>
+  <h2 class="section-title reveal">Projects as Interactive Worlds</h2>
+  <p class="section-sub reveal">Every circuit board tells a story. These are mine.</p>
+  <div class="proj-grid reveal">
+    <div class="proj-card span-8">
+      <div class="proj-visual"></div>
+      <span class="proj-label amber">⭐ Flagship</span>
+      <div class="proj-title">VitaWatch</div>
+      <div class="proj-subtitle">Smart Health Monitoring Wearable</div>
+      <p class="proj-desc">An IoT-enabled smart wearable built with ESP32-S3 Zero for real-time health monitoring — heart rate, SpO2, environmental sensing, touch controls, and OLED display in a portable wearable form factor. The most complex thing I've built.</p>
+      <div class="chip-row">
+        <span class="chip">Heart Rate &amp; SpO2</span>
+        <span class="chip">OLED Display</span>
+        <span class="chip">Smart Alerts</span>
+        <span class="chip">Touch Controls</span>
+        <span class="chip">LiPo Battery</span>
+        <span class="chip">IoT Integration</span>
+      </div>
+      <div class="chip-row">
+        <span class="stack-chip">ESP32-S3</span>
+        <span class="stack-chip">MAX30102</span>
+        <span class="stack-chip">BME280</span>
+        <span class="stack-chip">Embedded C</span>
+      </div>
+    </div>
+    <div class="proj-card span-4">
+      <div class="proj-visual"></div>
+      <span class="proj-label">Major Project</span>
+      <div class="proj-title">Vital Nova Pod</div>
+      <div class="proj-subtitle">Smart Baby Health Monitor</div>
+      <p class="proj-desc">Futuristic infant healthcare system with real-time vital tracking, environmental monitoring, and smart parent alerts. JNTUH major project.</p>
+      <div class="chip-row">
+        <span class="stack-chip">ESP32</span>
+        <span class="stack-chip">MAX30102</span>
+        <span class="stack-chip">BME280</span>
+        <span class="stack-chip">MQTT</span>
+      </div>
+    </div>
+    <div class="proj-card span-6">
+      <div class="proj-visual"></div>
+      <span class="proj-label purple">Wearable</span>
+      <div class="proj-title">AI Voice Assistant Watch</div>
+      <div class="proj-subtitle">Futuristic Wearable Concept</div>
+      <p class="proj-desc">ESP32-based wearable assistant concept with INMP441 microphone, smart voice interaction, and OLED communication interface.</p>
+      <div class="chip-row">
+        <span class="stack-chip">ESP32</span>
+        <span class="stack-chip">INMP441</span>
+        <span class="stack-chip">OLED</span>
+        <span class="stack-chip">AI Concept</span>
+      </div>
+    </div>
+    <div class="proj-card span-6">
+      <div class="proj-visual"></div>
+      <span class="proj-label">Safety</span>
+      <div class="proj-title">Women Safety Device</div>
+      <div class="proj-subtitle">Emergency SOS Wearable</div>
+      <p class="proj-desc">Emergency wearable combining GPS tracking and GSM alert system — sending SOS with live location to trusted contacts instantly.</p>
+      <div class="chip-row">
+        <span class="stack-chip">Arduino</span>
+        <span class="stack-chip">GPS Module</span>
+        <span class="stack-chip">SIM800L</span>
+      </div>
+    </div>
+    <div class="proj-card span-3">
+      <span class="proj-label">IoT</span>
+      <div class="proj-title">Smart Talking Plant Pot</div>
+      <div class="proj-subtitle">Plant Monitor</div>
+      <p class="proj-desc">IoT plant monitoring with soil sensing, auto-watering, OLED display, and voice feedback via DFPlayer module.</p>
+      <div class="chip-row">
+        <span class="stack-chip">ESP32</span>
+        <span class="stack-chip">DFPlayer</span>
+      </div>
+    </div>
+    <div class="proj-card span-3">
+      <span class="proj-label">Tracking</span>
+      <div class="proj-title">GPS Tracking System</div>
+      <div class="proj-subtitle">Real-Time Location</div>
+      <p class="proj-desc">Real-time GPS location monitoring using NEO-6M module with OLED integration for live positioning.</p>
+      <div class="chip-row">
+        <span class="stack-chip">ESP32</span>
+        <span class="stack-chip">NEO-6M GPS</span>
+      </div>
+    </div>
+    <div class="proj-card span-3">
+      <span class="proj-label">EV</span>
+      <div class="proj-title">EV Safety System</div>
+      <div class="proj-subtitle">Electric Vehicle Monitor</div>
+      <p class="proj-desc">Next-gen EV monitoring prototype with intelligent battery monitoring and autonomous safety alerts.</p>
+      <div class="chip-row">
+        <span class="stack-chip">ESP32</span>
+        <span class="stack-chip">IoT</span>
+      </div>
+    </div>
+    <div class="proj-card span-3">
+      <span class="proj-label">Home</span>
+      <div class="proj-title">MQTT IoT Automation</div>
+      <div class="proj-subtitle">Smart Home System</div>
+      <p class="proj-desc">Real-time IoT communication between ESP32 modules using MQTT publish/subscribe architecture.</p>
+      <div class="chip-row">
+        <span class="stack-chip">ESP32</span>
+        <span class="stack-chip">MQTT</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ EDUCATION ═══════════════ -->
+<section id="education" class="section">
+  <div class="eyebrow">Academic Log</div>
+  <h2 class="section-title reveal">Education &amp; Qualifications</h2>
+  <div class="edu-list reveal">
+    <div class="edu-item">
+      <div class="edu-year">2022–2026</div>
+      <div class="edu-body">
+        <h3>B.Tech — Electronics &amp; Communication Engineering</h3>
+        <p>AAR Mahaveer Engineering College, Hyderabad · JNTUH</p>
+        <div class="cgpa">CGPA: 7.68 · Graduated 2026</div>
+      </div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-year">2022</div>
+      <div class="edu-body">
+        <h3>Intermediate — MPC</h3>
+        <p>Sri Medha Junior College · Telangana State Board</p>
+        <div class="cgpa">CGPA: 7.5</div>
+      </div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-year">2020</div>
+      <div class="edu-body">
+        <h3>SSC — Secondary School Certificate</h3>
+        <p>New Brilliant High School · SSC Board</p>
+        <div class="cgpa">CGPA: 9.0</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ JOURNEY TIMELINE ═══════════════ -->
+<section id="journey" class="section">
+  <div class="eyebrow">System Log</div>
+  <h2 class="section-title reveal">My Journey Timeline</h2>
+  <p class="section-sub reveal">From first circuit to flagship product — every milestone that made me who I am.</p>
+  <div class="tl-wrap">
+    <div class="tl-spine"></div>
+    <div class="tl-item" data-delay="0">
+      <div class="tl-node"></div>
+      <div class="tl-year">2022</div>
+      <div class="tl-title">ECE Journey Begins</div>
+      <p class="tl-desc">Enrolled in Electronics and Communication Engineering. First encounter with circuit theory, electronics fundamentals, and the magic of embedded systems. The spark that started everything.</p>
+    </div>
+    <div class="tl-item" data-delay="100">
+      <div class="tl-node"></div>
+      <div class="tl-year">2022–23</div>
+      <div class="tl-title">First Circuits, First Code</div>
+      <p class="tl-desc">Hands-on experiments with Arduino, basic sensors, and simple circuits. Discovered the powerful synergy between hardware and software — the moment I knew this was my calling.</p>
+    </div>
+    <div class="tl-item" data-delay="200">
+      <div class="tl-node purple"></div>
+      <div class="tl-year purple">2023</div>
+      <div class="tl-title">ESP32 &amp; IoT Deep Dive</div>
+      <p class="tl-desc">Upgraded to ESP32 ecosystem. Built first Wi-Fi connected projects, mastered I2C/SPI protocols, integrated MAX30102 and BME280, published data to cloud via MQTT.</p>
+    </div>
+    <div class="tl-item" data-delay="300">
+      <div class="tl-node amber"></div>
+      <div class="tl-year amber">2024</div>
+      <div class="tl-title">VitaWatch — Wearable Leap</div>
+      <p class="tl-desc">Designed and built VitaWatch using ESP32-S3 Zero — miniaturizing everything into a wearable health monitor. Solved real challenges: power management, sensor accuracy, form factor.</p>
+    </div>
+    <div class="tl-item" data-delay="400">
+      <div class="tl-node"></div>
+      <div class="tl-year">2025</div>
+      <div class="tl-title">Vital Nova Pod — Major Project</div>
+      <p class="tl-desc">Conceived and developed Vital Nova Pod as a JNTUH major project — a full IoT infant healthcare system with AI health prediction concepts and parent notification systems.</p>
+    </div>
+    <div class="tl-item" data-delay="500">
+      <div class="tl-node amber"></div>
+      <div class="tl-year amber">2026 →</div>
+      <div class="tl-title">Graduating &amp; Building Forward</div>
+      <p class="tl-desc">B.Tech ECE graduate (CGPA: 7.68). Actively exploring Edge AI, TinyML, and next-generation wearable health tech. Building toward founding an embedded tech startup.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ LIVE ACTIVITY DASHBOARD ═══════════════ -->
+<section id="dashboard" class="section">
+  <div class="eyebrow">Live Activity</div>
+  <h2 class="section-title reveal">Activity Dashboard</h2>
+  <p class="section-sub reveal">A real-time snapshot of where I am, what I'm building, and what drives me.</p>
+  <div class="dash-grid reveal" id="dashGrid">
+    <div class="dash-card">
+      <div class="dc-label">Projects Shipped</div>
+      <div class="dc-value" id="dc1">0</div>
+      <div class="dc-sub">embedded systems builds</div>
+      <div class="dc-bar-wrap"><div class="dc-bar" style="width:85%"></div></div>
+    </div>
+    <div class="dash-card">
+      <div class="dc-label">CGPA</div>
+      <div class="dc-value amber" id="dc2">0.00</div>
+      <div class="dc-sub">JNTUH · ECE</div>
+      <div class="dc-bar-wrap"><div class="dc-bar" style="width:76.8%"></div></div>
+    </div>
+    <div class="dash-card">
+      <div class="dc-label">Core Platform</div>
+      <div class="dc-value purple" style="font-size:1.4rem">ESP32</div>
+      <div class="dc-sub">Wi-Fi + BLE enabled</div>
+      <div class="dc-bar-wrap"><div class="dc-bar" style="width:95%"></div></div>
+    </div>
+    <div class="dash-card">
+      <div class="dc-label">Status</div>
+      <div class="dc-value" style="font-size:1rem;color:#4ade80;margin-top:6px">🟢 Available</div>
+      <div class="dc-sub">For freelance &amp; collab</div>
+    </div>
+    <div class="dash-card">
+      <div class="dc-label">Years Building</div>
+      <div class="dc-value" id="dc5">0</div>
+      <div class="dc-sub">hands-on experience</div>
+      <div class="dc-bar-wrap"><div class="dc-bar" style="width:40%"></div></div>
+    </div>
+    <div class="dash-card">
+      <div class="dc-label">Specialization</div>
+      <div class="dc-value" style="font-size:1rem;margin-top:6px">IoT + AI</div>
+      <div class="dc-sub">edge intelligence</div>
+    </div>
+  </div>
+  <div class="activity-log reveal">
+    <div class="al-title">Recent Activity Feed</div>
+    <div class="al-feed">
+      <div class="al-entry">
+        <div class="al-dot cyan"></div>
+        <div class="al-text"><strong>VitaWatch v2</strong> — exploring miniaturized ESP32-S3 health wearable with TinyML inference on-device</div>
+        <div class="al-time">2026</div>
+      </div>
+      <div class="al-entry">
+        <div class="al-dot amber"></div>
+        <div class="al-text"><strong>Vital Nova Pod</strong> — JNTUH major project submitted; full IoT infant health monitoring system delivered</div>
+        <div class="al-time">2025</div>
+      </div>
+      <div class="al-entry">
+        <div class="al-dot purple"></div>
+        <div class="al-text"><strong>Fiverr Launch</strong> — ESP32 / PCB design / IoT freelancing profile live; first client projects in progress</div>
+        <div class="al-time">2025</div>
+      </div>
+      <div class="al-entry">
+        <div class="al-dot cyan"></div>
+        <div class="al-text"><strong>Edge AI Research</strong> — studying TinyML deployment on ESP32 and nRF52832 for sub-10mW inference</div>
+        <div class="al-time">Ongoing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ VISION ═══════════════ -->
+<section id="vision" class="section">
+  <div class="eyebrow">Future.exe</div>
+  <h2 class="section-title reveal">Future Vision</h2>
+  <p class="section-sub reveal">The next revolution won't be on screens. It'll be embedded in your skin, your home, your heartbeat.</p>
+  <div class="vision-grid reveal">
+    <div class="vision-card">
+      <div class="vc-icon">🧠</div>
+      <div class="vc-title">AI-Integrated Wearables</div>
+      <p class="vc-desc">Devices that don't just collect data — they understand it. TinyML models predicting health events before they happen, running on a coin cell.</p>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🏥</div>
+      <div class="vc-title">Smart Healthcare Systems</div>
+      <p class="vc-desc">Making hospital-grade diagnostics accessible to every family — from smart infant pods to wearable ECG earrings detecting cardiac anomalies continuously.</p>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🌍</div>
+      <div class="vc-title">Intelligent IoT Ecosystems</div>
+      <p class="vc-desc">Connected environments where every sensor is a node of awareness — buildings that respond, vehicles that protect, cities that heal in real time.</p>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">⚡</div>
+      <div class="vc-title">Embedded AI at the Edge</div>
+      <p class="vc-desc">Moving intelligence off the cloud onto the chip. Sub-10mW inference on ESP32 and nRF52 — making AI democratically available, even offline.</p>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">❤️</div>
+      <div class="vc-title">Human-Centered Technology</div>
+      <p class="vc-desc">Every product starts with a human truth — a real pain point, a real family, a real moment where technology can restore dignity or save a life.</p>
+    </div>
+    <div class="vision-card">
+      <div class="vc-icon">🚀</div>
+      <div class="vc-title">From Engineer to Founder</div>
+      <p class="vc-desc">The goal isn't just to build products — it's to build a company. An embedded tech startup that ships real hardware and changes what embedded systems can do.</p>
+    </div>
+  </div>
+  <div class="vision-quote reveal">
+    <div class="vq-text">"If you want to find the secrets of the universe, think in terms of energy, frequency and vibration."</div>
+    <div class="vq-attr">— Nikola Tesla · The guiding philosophy</div>
+  </div>
+</section>
+
+<hr class="hdiv"/>
+
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<section id="contact" class="section">
+  <div class="eyebrow">Open Channel</div>
+  <h2 class="section-title reveal">Let's Connect</h2>
+  <p class="section-sub reveal">Open for collaborations, embedded systems development, IoT solutions, and futuristic technology ideas.</p>
+  <div class="contact-grid reveal">
+    <div>
+      <div class="ct-avail"><span class="ct-avail-dot"></span> Available for New Projects</div>
+      <div class="ct-name">Kethur Sai Krishna</div>
+      <div class="ct-row"><div class="ct-icon">📞</div><div><div class="ct-key">Phone</div><div class="ct-val"><a href="tel:+917396549426">+91 73965 49426</a></div></div></div>
+      <div class="ct-row"><div class="ct-icon">✉️</div><div><div class="ct-key">Email</div><div class="ct-val"><a href="mailto:kethursaikrishna@gmail.com">kethursaikrishna@gmail.com</a></div></div></div>
+      <div class="ct-row"><div class="ct-icon">📍</div><div><div class="ct-key">Location</div><div class="ct-val">Hyderabad, Telangana, India</div></div></div>
+      <div class="ct-socials">
+        <a href="https://www.linkedin.com/in/kethur-saikrishna" target="_blank" class="soc">LinkedIn</a>
+        <a href="https://github.com/kethur-saikrishna" target="_blank" class="soc">GitHub</a>
+        <a href="https://www.instagram.com/Kethur_sai_krishna" target="_blank" class="soc">Instagram</a>
+        <a href="https://medium.com/@kethursaikrishna" target="_blank" class="soc">Medium</a>
+      </div>
+    </div>
+    <div id="request">
+      <div class="ct-form">
+        <div class="ct-form-title">⚡ Request a Project / Share Your Idea</div>
+        <p class="ct-form-sub">Tell me what you need — I'll respond within 24 hours with a plan and quote.</p>
+        <form action="https://formsubmit.co/kethursaikrishna@gmail.com" method="POST">
+          <input type="hidden" name="_subject" value="New Project Request from Portfolio — KSK"/>
+          <input type="hidden" name="_captcha" value="false"/>
+          <input type="hidden" name="_template" value="table"/>
+          <input type="hidden" name="_next" value="https://kethur-saikrishna.github.io/#contact"/>
+          <div class="form-row">
+            <div class="fg"><label for="fn">Your Name *</label><input type="text" id="fn" name="name" placeholder="e.g. Ravi Kumar" required/></div>
+            <div class="fg"><label for="fe">Email Address *</label><input type="email" id="fe" name="email" placeholder="your@email.com" required/></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label for="fp">Phone / WhatsApp</label><input type="tel" id="fp" name="phone" placeholder="+91 XXXXX XXXXX"/></div>
+            <div class="fg">
+              <label for="fs">Service Needed *</label>
+              <select id="fs" name="service" required>
+                <option value="" disabled selected>Select a service…</option>
+                <option value="Final-Year Project">🎓 Final-Year Project</option>
+                <option value="Mini Project">⚡ Mini Project</option>
+                <option value="IoT Solution">🌐 IoT Solution</option>
+                <option value="Custom Hardware Project">🔩 Custom Hardware Project</option>
+                <option value="Collaboration or Idea">💡 Collaboration / Share an Idea</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg"><label for="fi">Project Idea / Requirements *</label><textarea id="fi" name="project_idea" placeholder="Describe your idea, what it should do, specific components you have in mind, timeline, and budget if known…" required></textarea></div>
+          <button type="submit" class="form-btn">🚀 Send My Project Request</button>
+          <p class="form-note">📧 Goes directly to kethursaikrishna@gmail.com · Response within 24 hours</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">&lt;KSK/&gt;</div>
+  <div class="foot-copy">© 2026 Kethur Sai Krishna · Built with intention, shipped with purpose · ECE Graduate, JNTUH 2026</div>
+  <a href="#request" class="btn-primary" style="font-size:.72rem;padding:9px 18px;">⚡ Request a Project</a>
+</footer>
+
+<script>
+// ── CANVAS PARTICLE SYSTEM ──
+(function(){
+  const canvas=document.getElementById('bg-canvas');
+  const ctx=canvas.getContext('2d');
+  let W=window.innerWidth,H=window.innerHeight;
+  let mouse={x:W/2,y:H/2};
+  canvas.width=W;canvas.height=H;
+  window.addEventListener('resize',()=>{W=window.innerWidth;H=window.innerHeight;canvas.width=W;canvas.height=H;});
+  window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
+
+  const COUNT=70;
+  const particles=[];
+  for(let i=0;i<COUNT;i++){
+    particles.push({
+      x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+      r:Math.random()*1.5+.5,
+      alpha:Math.random()*.4+.1,
+      color:Math.random()>.5?'0,245,212':'139,92,246'
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // grid
+    ctx.strokeStyle='rgba(0,245,212,0.025)';
+    ctx.lineWidth=1;
+    for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    particles.forEach(p=>{
+      // mouse repulsion
+      const dx=p.x-mouse.x,dy=p.y-mouse.y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){const f=(120-dist)/120*.6;p.vx+=dx/dist*f*.04;p.vy+=dy/dist*f*.04;}
+      p.vx*=.99;p.vy*=.99;
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.color},${p.alpha})`;ctx.fill();
+    });
+
+    // connect nearby
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<100){
+          ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(0,245,212,${.07*(1-d/100)})`;ctx.lineWidth=.5;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── CURSOR ──
+(function(){
+  const dot=document.getElementById('cursorDot');
+  const ring=document.getElementById('cursorRing');
+  let rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{
+    dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';
+    rx+=(e.clientX-rx)*.14;ry+=(e.clientY-ry)*.14;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+  });
+  function trackRing(){
+    requestAnimationFrame(trackRing);
+  }
+  trackRing();
+  document.querySelectorAll('a,button,.svc-card,.proj-card,.vision-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.width='56px';ring.style.height='56px';ring.style.opacity='.7';});
+    el.addEventListener('mouseleave',()=>{ring.style.width='36px';ring.style.height='36px';ring.style.opacity='1';});
+  });
+})();
+
+// ── BOOT CANVAS (circuit trace animation) ──
+(function(){
+  const c=document.getElementById('boot-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+
+  const CYAN='rgba(0,245,212,',PUR='rgba(139,92,246,';
+  // circuit nodes
+  const nodes=[];
+  for(let i=0;i<28;i++)nodes.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.8+.6,col:Math.random()>.5?CYAN:PUR});
+
+  // traces (animated lines)
+  const traces=[];
+  for(let i=0;i<18;i++){
+    const sx=Math.random()*c.width,sy=Math.random()*c.height;
+    const angle=Math.floor(Math.random()*4)*(Math.PI/2);
+    const len=Math.random()*200+80;
+    traces.push({sx,sy,ex:sx+Math.cos(angle)*len,ey:sy+Math.sin(angle)*len,prog:0,speed:.012+Math.random()*.018,col:Math.random()>.5?CYAN:PUR,alpha:.12+Math.random()*.14,delay:Math.random()*60|0});
+  }
+
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    // dark vignette
+    const vg=ctx.createRadialGradient(c.width/2,c.height/2,0,c.width/2,c.height/2,c.width*.7);
+    vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.7)');
+    ctx.fillStyle=vg;ctx.fillRect(0,0,c.width,c.height);
+
+    // circuit traces
+    traces.forEach(t=>{
+      if(frame<t.delay)return;
+      t.prog=Math.min(t.prog+t.speed,1);
+      const ex=t.sx+(t.ex-t.sx)*t.prog,ey=t.sy+(t.ey-t.sy)*t.prog;
+      ctx.beginPath();ctx.moveTo(t.sx,t.sy);ctx.lineTo(ex,ey);
+      ctx.strokeStyle=t.col+t.alpha+')';ctx.lineWidth=1;ctx.stroke();
+      // endpoint dot
+      if(t.prog>.98){
+        ctx.beginPath();ctx.arc(t.ex,t.ey,3,0,Math.PI*2);
+        ctx.fillStyle=t.col+'0.6)';ctx.fill();
+      }
+    });
+
+    // floating nodes
+    nodes.forEach(n=>{
+      n.x+=n.vx;n.y+=n.vy;
+      if(n.x<0)n.x=c.width;if(n.x>c.width)n.x=0;
+      if(n.y<0)n.y=c.height;if(n.y>c.height)n.y=0;
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.fillStyle=n.col+'0.5)';ctx.fill();
+    });
+    // connect close nodes
+    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+      const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<140){ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.strokeStyle=`rgba(0,245,212,${.06*(1-d/140)})`;ctx.lineWidth=.5;ctx.stroke();}
+    }
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── LOADER CLOCK ──
+(function(){
+  function tick(){
+    const now=new Date();
+    const h=String(now.getHours()).padStart(2,'0');
+    const m=String(now.getMinutes()).padStart(2,'0');
+    const s=String(now.getSeconds()).padStart(2,'0');
+    const el=document.getElementById('l-clock');
+    if(el)el.textContent=h+':'+m+':'+s;
+  }
+  tick();setInterval(tick,1000);
+})();
+
+// ── CINEMATIC LOADER SEQUENCE ──
+(function(){
+  const steps=[
+    {pct:8, txt:'Powering up KSK-OS...'},
+    {pct:20,txt:'Loading ESP32-S3 firmware...'},
+    {pct:34,txt:'Initializing sensor stack...'},
+    {pct:48,txt:'Connecting IoT protocols...'},
+    {pct:62,txt:'Mounting edge AI modules...'},
+    {pct:74,txt:'Calibrating BLE / Wi-Fi...'},
+    {pct:85,txt:'Rendering holographic UI...'},
+    {pct:95,txt:'Launching portfolio...'},
+    {pct:100,txt:'System online.'},
+  ];
+  const bar=document.getElementById('l-bar');
+  const pct=document.getElementById('l-pct');
+  const status=document.getElementById('l-status');
+  const tagline=document.getElementById('l-tagline');
+  const taglines=['Embedded Systems Engineer_','IoT Developer_','Product Innovator_','Building the Future_'];
+  let tli=0;
+  // typewriter tagline
+  function nextTagline(){
+    const tl=taglines[tli%taglines.length];tli++;
+    tagline.textContent='';
+    let ci=0;
+    const iv=setInterval(()=>{
+      ci++;tagline.textContent=tl.slice(0,ci);
+      if(ci>=tl.length){clearInterval(iv);setTimeout(nextTagline,900);}
+    },55);
+  }
+  setTimeout(nextTagline,400);
+
+  let si=0;
+  function runStep(){
+    if(si>=steps.length)return;
+    const s=steps[si++];
+    bar.style.width=s.pct+'%';
+    pct.textContent=s.pct+'%';
+    status.textContent=s.txt;
+    if(si<steps.length)setTimeout(runStep,si===1?300:220);
+    else{
+      setTimeout(()=>{
+        document.getElementById('loader').classList.add('out');
+        setTimeout(()=>{
+          const l=document.getElementById('loader');if(l)l.remove();
+          // name reveal
+          setTimeout(()=>document.getElementById('nl1').classList.add('show'),80);
+          setTimeout(()=>document.getElementById('nl2').classList.add('show'),260);
+          // hero typewriter
+          startHeroType();
+        },1100);
+      },600);
+    }
+  }
+  setTimeout(runStep,300);
+})();
+
+// ── HERO TYPEWRITER ──
+function startHeroType(){
+  const lines=['Embedded Systems Engineer','IoT Developer','Product Innovator','Building the Future'];
+  let li=0,ci=0,deleting=false;
+  const el=document.getElementById('heroType');
+  if(!el)return;
+  function tick(){
+    const line=lines[li];
+    if(!deleting){
+      ci++;el.innerHTML=line.slice(0,ci)+'<span class="caret">|</span>';
+      if(ci===line.length){deleting=true;setTimeout(tick,1400);return;}
+    }else{
+      ci--;el.innerHTML=line.slice(0,ci)+'<span class="caret">|</span>';
+      if(ci===0){deleting=false;li=(li+1)%lines.length;}
+    }
+    setTimeout(tick,deleting?38:62);
+  }
+  tick();
+}
+
+// ── CHIP CANVAS (holographic ESP32 visualization) ──
+(function(){
+  const canvas=document.getElementById('chip-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W=canvas.offsetWidth,H=canvas.offsetHeight;
+  canvas.width=W;canvas.height=H;
+  let mx=W/2,my=H/2;
+  canvas.parentElement.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;
+  });
+  window.addEventListener('resize',()=>{W=canvas.offsetWidth;H=canvas.offsetHeight;canvas.width=W;canvas.height=H;});
+
+  const CX=W/2,CY=H/2;
+  const CYAN='#00f5d4',PUR='#8b5cf6',AMB='#f59e0b';
+  let rot=0;
+
+  // pin labels for chip
+  const PINS_L=['VCC','GND','EN','IO0','IO1','IO2','IO3','IO4'];
+  const PINS_R=['IO34','IO35','IO36','IO39','TXD','RXD','SCL','SDA'];
+
+  function drawChip(){
+    const chipW=W*.34,chipH=H*.44;
+    const cx=CX-chipW/2,cy=CY-chipH/2;
+
+    // glow behind chip
+    const g=ctx.createRadialGradient(CX,CY,0,CX,CY,chipW*.9);
+    g.addColorStop(0,'rgba(0,245,212,0.07)');g.addColorStop(.6,'rgba(139,92,246,0.04)');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+    // chip body
+    ctx.fillStyle='rgba(10,20,35,0.92)';
+    ctx.strokeStyle='rgba(0,245,212,0.35)';ctx.lineWidth=1.5;
+    roundRect(ctx,cx,cy,chipW,chipH,10);ctx.fill();ctx.stroke();
+
+    // inner die
+    ctx.strokeStyle='rgba(0,245,212,0.15)';ctx.lineWidth=1;
+    roundRect(ctx,cx+chipW*.12,cy+chipH*.12,chipW*.76,chipH*.76,6);ctx.stroke();
+
+    // center logo text
+    ctx.fillStyle=CYAN;ctx.font=`700 ${chipW*.13}px 'Syne',sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('ESP32',CX,CY-chipH*.06);
+    ctx.fillStyle='rgba(0,245,212,0.5)';ctx.font=`500 ${chipW*.07}px 'JetBrains Mono',monospace`;
+    ctx.fillText('S3 ZERO',CX,CY+chipH*.07);
+
+    // pins LEFT
+    const pinH=chipH/(PINS_L.length+1);
+    PINS_L.forEach((p,i)=>{
+      const py=cy+(i+1)*pinH;
+      ctx.strokeStyle='rgba(0,245,212,0.5)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cx,py);ctx.lineTo(cx-chipW*.14,py);ctx.stroke();
+      ctx.beginPath();ctx.arc(cx-chipW*.14,py,3,0,Math.PI*2);ctx.fillStyle=CYAN;ctx.fill();
+      ctx.fillStyle='rgba(0,245,212,0.55)';ctx.font=`${chipW*.065}px 'JetBrains Mono',monospace`;
+      ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(p,cx-chipW*.18,py);
+    });
+    // pins RIGHT
+    PINS_R.forEach((p,i)=>{
+      const py=cy+(i+1)*pinH;
+      ctx.strokeStyle='rgba(139,92,246,0.5)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cx+chipW,py);ctx.lineTo(cx+chipW+chipW*.14,py);ctx.stroke();
+      ctx.beginPath();ctx.arc(cx+chipW+chipW*.14,py,3,0,Math.PI*2);ctx.fillStyle=PUR;ctx.fill();
+      ctx.fillStyle='rgba(139,92,246,0.55)';ctx.font=`${chipW*.065}px 'JetBrains Mono',monospace`;
+      ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(p,cx+chipW+chipW*.18,py);
+    });
+  }
+
+  // orbiting data nodes
+  const ORBITS=[
+    {r:W*.3,speed:.008,nodes:[{angle:0,label:'MQTT',col:CYAN},{angle:Math.PI*.6,label:'BLE',col:PUR},{angle:Math.PI*1.2,label:'Wi-Fi',col:CYAN}]},
+    {r:W*.22,speed:-.013,nodes:[{angle:.4,label:'I2C',col:AMB},{angle:Math.PI+.4,label:'SPI',col:CYAN}]},
+  ];
+
+  // mouse parallax tilt
+  function drawFrame(){
+    ctx.clearRect(0,0,W,H);
+    const tiltX=(mx-CX)/CX*.04;
+    const tiltY=(my-CY)/CY*.04;
+    ctx.save();
+    ctx.translate(CX,CY);
+    ctx.transform(1,tiltY,tiltX,1,0,0);
+    ctx.translate(-CX,-CY);
+
+    drawChip();
+
+    // orbits
+    ORBITS.forEach(orb=>{
+      // orbit ring
+      ctx.beginPath();ctx.arc(CX,CY,orb.r,0,Math.PI*2);
+      ctx.strokeStyle='rgba(0,245,212,0.06)';ctx.lineWidth=1;ctx.setLineDash([4,8]);ctx.stroke();ctx.setLineDash([]);
+
+      orb.nodes.forEach(n=>{
+        n.angle+=orb.speed;
+        const nx=CX+Math.cos(n.angle)*orb.r,ny=CY+Math.sin(n.angle)*orb.r;
+        // node dot
+        ctx.beginPath();ctx.arc(nx,ny,5,0,Math.PI*2);
+        ctx.fillStyle=n.col;ctx.fill();
+        ctx.beginPath();ctx.arc(nx,ny,10,0,Math.PI*2);
+        const gn=ctx.createRadialGradient(nx,ny,0,nx,ny,10);
+        gn.addColorStop(0,n.col+'66');gn.addColorStop(1,'transparent');
+        ctx.fillStyle=gn;ctx.fill();
+        // label
+        const offX=nx<CX?-18:18;
+        ctx.fillStyle=n.col;ctx.font=`600 ${W*.025}px 'JetBrains Mono',monospace`;
+        ctx.textAlign=nx<CX?'right':'left';ctx.textBaseline='middle';ctx.fillText(n.label,nx+offX,ny);
+        // connector line
+        ctx.beginPath();ctx.moveTo(nx,ny);ctx.lineTo(CX,CY);
+        ctx.strokeStyle=n.col+'18';ctx.lineWidth=.5;ctx.stroke();
+      });
+    });
+
+    // scan pulse ring
+    rot+=.008;
+    const pulse=(Math.sin(rot*3)*.5+.5);
+    ctx.beginPath();ctx.arc(CX,CY,W*.38+pulse*8,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(0,245,212,${pulse*.06})`;ctx.lineWidth=1.5;ctx.stroke();
+
+    ctx.restore();
+    requestAnimationFrame(drawFrame);
+  }
+  drawFrame();
+
+  function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+})();
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>40);
+  document.getElementById('stb').classList.toggle('vis',window.scrollY>500);
+});
+
+// ── MOBILE NAV ──
+function toggleMob(){
+  document.getElementById('mobNav').classList.toggle('open');
+  document.getElementById('hbg').classList.toggle('active');
+}
+function closeMob(){
+  document.getElementById('mobNav').classList.remove('open');
+  document.getElementById('hbg').classList.remove('active');
+}
+
+// ── INTERSECTION OBSERVER ──
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('show');
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal,.tl-item').forEach(el=>io.observe(el));
+
+// ── SKILL BARS ──
+const skillObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.sz-bar').forEach(b=>{b.classList.add('animated');});
+      skillObs.unobserve(e.target);
+    }
+  });
+},{threshold:.2});
+const su=document.getElementById('skillsUniverse');
+if(su)skillObs.observe(su);
+
+// ── DASHBOARD BARS + COUNTERS ──
+const dashObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.dc-bar').forEach(b=>{b.classList.add('animated');});
+      // count up
+      countUp('dc1',0,10,1200);
+      countUp('dc2',0,7.68,1400,2);
+      countUp('dc5',0,4,1000);
+      dashObs.unobserve(e.target);
+    }
+  });
+},{threshold:.2});
+const dg=document.getElementById('dashGrid');
+if(dg)dashObs.observe(dg);
+
+function countUp(id,from,to,dur,dec=0){
+  const el=document.getElementById(id);if(!el)return;
+  const start=performance.now();
+  function step(now){
+    const t=Math.min((now-start)/dur,1);
+    const val=from+(to-from)*easeOut(t);
+    el.textContent=dec?val.toFixed(dec):Math.round(val);
+    if(t<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function easeOut(t){return 1-Math.pow(1-t,3)}
+
+// ── SERVICE CARD MOUSE GLOW ──
+document.querySelectorAll('.svc-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+    card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+  });
+});
+</script>
+</body>
+</html>
